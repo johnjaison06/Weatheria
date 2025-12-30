@@ -3,10 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const {connectToMongoDB} = require("./database");
 
-
-
-
-
 const app = express();
 
 app.use(cors());    
