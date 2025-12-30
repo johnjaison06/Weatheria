@@ -11,14 +11,16 @@ export default function App() {
 
   const [typeofWeather, setTypeofWeather] = React.useState("");
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
  const API_KEY = process.env.REACT_APP_OPENWEATHER_KEY;
 
 
-  const getWeather = async () => {
-    const res = await fetch("/api/weather");
-    const weather = await res.json();
-    setState(weather);
-  };
+const getWeather = async () => {
+  const res = await fetch(`${API_BASE}/api/weather`);
+  const weather = await res.json();
+  setState(weather);
+};
+
 
   React.useEffect(() => {
     getWeather();
@@ -28,7 +30,7 @@ export default function App() {
     if (!city) return;
 
     fetch(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
+      `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -43,7 +45,7 @@ export default function App() {
     if (!lat || !lon) return;
 
     fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=ce69fa716d4e8918e94121da2f0250ee`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
     )
       .then((res) => res.json())
       .then((data) => setClimate(data));
@@ -66,21 +68,22 @@ export default function App() {
     e.preventDefault();
     if (!city) return;
 
-    await fetch("/api/weather", {
-      method: "POST",
-      headers: { "Content-type": "application/json" },
-      body: JSON.stringify({ city }),
-    });
+ await fetch(`${API_BASE}/api/weather`, {
+  method: "POST",
+  headers: { "Content-type": "application/json" },
+  body: JSON.stringify({ city }),
+});
 
     setCity("");
-    setClimate('')
+    setClimate(null)
     getWeather();
   };
 
-  const deleteCity = async (id) => {
-    await fetch(`/api/weather/${id}`, { method: "DELETE" });
-    getWeather();
-  };
+const deleteCity = async (id) => { 
+  await fetch(`${API_BASE}/api/weather/${id}`, { method: "DELETE" });
+    getWeather(); 
+    };
+
 
   React.useEffect(() => {
     if (!state.length) {
@@ -93,7 +96,7 @@ export default function App() {
 
     state.forEach((fav) => {
       fetch(
-        `http://api.openweathermap.org/geo/1.0/direct?q=${fav.city}&limit=1&appid=ce69fa716d4e8918e94121da2f0250ee`
+        `https://api.openweathermap.org/geo/1.0/direct?q=${fav.city}&limit=1&appid=${API_KEY}`
       )
         .then((res) => res.json())
         .then((data) => {
@@ -110,7 +113,7 @@ export default function App() {
     Promise.all(
       favlocation.map(async (fav) => {
         const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${fav.lat}&lon=${fav.lon}&units=metric&appid=ce69fa716d4e8918e94121da2f0250ee`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${fav.lat}&lon=${fav.lon}&units=metric&appid=${API_KEY}`
         );
         const data = await res.json();
         return processWeatherData({ ...data, _id: fav._id });
